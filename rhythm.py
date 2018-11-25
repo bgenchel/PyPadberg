@@ -1,17 +1,8 @@
-
 # coding: utf-8
-
-# In[1]:
-
-
 from functools import reduce
 from itertools import combinations, chain
 from math import gcd
 import numpy as np
-
-
-# In[2]:
-
 
 #Lowest Common Multiple
 def lcm(lcm_values):
@@ -54,5 +45,3 @@ def rhythm_gen(lcm_values):
     c = b - a
     
     return c
-
-

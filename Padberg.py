@@ -1,19 +1,12 @@
 from mido import Message, MidiFile, MidiTrack
 from audiolazy import lazy_midi
-from richard2 import rhythm_gen
+from rhythm import rhythm_gen
 from math import floor
-# import nltk
-#
-# entries = nltk.corpus.cmudict.entries()
-# len(entries)
-#
-# d_entries = {}
-# for key, ph in entries:
-#     ph_string = ' '.join(ph)
-#     d_entries.update({key: ph_string.lower()})
 
+PITCHES_CENTER = 22
+PITCHES_OUTER = 22
 
-letter_freq = {
+LETTER_FREQS = {
     'A':440,
     'B':458.3333,
     'C':476.6666,
@@ -41,50 +34,55 @@ letter_freq = {
     'Z':861.6666
 }
 
-text = "harriet"
 
-words = text.split(' ')
+class Padberg:
 
-letters = []
-l_freqs = []
+    def __init__(self):
+        self.mid = None
 
+    def process_text(self, text):
+        words = text.split(' ')
 
-for word in words:
-    for letter in word:
-        letters.append(letter)
-        l_freqs.append(letter_freq[letter.upper()])
+        letters = []
+        l_freqs = []
 
-vowels = 0
-consonants = 0
-characters = 0
-pitches_center = 22
-pitches_outer = 22
+        for word in words:
+            for letter in word:
+                letters.append(letter)
+                l_freqs.append(LETTER_FREQS[letter.upper()])
 
-vowel_list = ['a', 'e', 'i', 'o', 'u']
+        vowels = 0
+        consonants = 0
+        characters = 0
 
-for i in text:
-    if i in vowel_list:
-        vowels += 1
-    else:
-        consonants += 1
-    characters += 1
+        vowel_list = ['a', 'e', 'i', 'o', 'u']
 
-lcm_values = [vowels, consonants, characters, pitches_center, pitches_outer]
+        for i in text:
+            if i in vowel_list:
+                vowels += 1
+            else:
+                consonants += 1
+            characters += 1
 
-rhythm_intervals = rhythm_gen(lcm_values)
+        lcm_values = [vowels, consonants, characters, PITCHES_CENTER, PITCHES_OUTER]
 
-mid = MidiFile()
-track = MidiTrack()
-mid.tracks.append(track)
+        rhythm_intervals = rhythm_gen(lcm_values)
 
-track.append(Message('program_change', program=12, time=0))
+        self.mid = MidiFile()
+        track = MidiTrack()
+        self.mid.tracks.append(track)
 
-for i in range(len(letters)):
-    j = i % len(rhythm_intervals)
-    print(letters[i], l_freqs[i], rhythm_intervals[j])
-    track.append(Message('note_on', note=floor(lazy_midi.freq2midi(l_freqs[i])), velocity=80, time=25))
-    track.append(Message('note_on', note=floor(lazy_midi.freq2midi(l_freqs[i])), velocity=0, time=rhythm_intervals[j]))
+        track.append(Message('program_change', program=12, time=0))
 
-mid.save(text+'.mid')
+        for i in range(len(letters)):
+            j = i % len(rhythm_intervals)
+            print(letters[i], l_freqs[i], rhythm_intervals[j])
+            track.append(Message('note_on', note=floor(lazy_midi.freq2midi(l_freqs[i])), velocity=80, time=25))
+            track.append(Message('note_on', note=floor(lazy_midi.freq2midi(l_freqs[i])), velocity=0, time=rhythm_intervals[j]))
 
-mid.play()
+        def save(self):
+            self.mid.save(text+'.mid')
+
+        def play(self):
+            if self.mid:
+                self.mid.play()

@@ -1,4 +1,4 @@
-from asciimatics.widgets import Frame, TextBox, Layout, Label, Divider, Widget, Button, PopUpDialog
+from asciimatics.widgets import Frame, TextBox, Layout, Label, Divider, Widget, Button, PopUpDialog, ListBox
 from asciimatics.effects import Print, Scroll
 from asciimatics.renderers import ColourImageFile, FigletText, ImageFile
 from asciimatics.scene import Scene
@@ -9,9 +9,11 @@ import sys
 
 from padberg import Padberg
 
-LABEL_DISCR = ["This is a python implementation of Harriet Padberg's 1963 Thesis,",
-               "\"Computer Composed Canon and Free Fugue\".",
+LABEL_DISCR = ["\nThis is a python implementation of Harriet Padberg's 1963 Thesis,",
+               "\n\"Computer Composed Canon and Free Fugue\".\n",
                "Enter a body of text below, and the program will convert it into serialist garbage."]
+
+PADBERG= Padberg()
 
 class TextFormFrame(Frame):
     def __init__(self, screen):
@@ -21,9 +23,9 @@ class TextFormFrame(Frame):
                          has_shadow=True,
                          title="PyPadberg")
 
-        layout_discr = Layout([1, 18, 1])
+        layout_discr = Layout([1, 10, 1])
         self.add_layout(layout_discr)
-        layout_discr.add_widget(Label("\n".join(LABEL_DISCR), height=5, align="^"), 1)
+        layout_discr.add_widget(Label("\n".join(LABEL_DISCR), height=8, align="^"), 1)
 
         layout_div_1 = Layout([100])
         self.add_layout(layout_div_1)
@@ -62,7 +64,7 @@ class TextFormFrame(Frame):
 
     def _submit(self):
         self.save(validate=True)
-        self.text = self.data["IT"]
+        PADBERG.process_text(self.data["IT"][0])
         raise NextScene()
 
     def _quit(self):
@@ -79,31 +81,82 @@ class TextFormFrame(Frame):
             raise StopApplication("User requested exit")
 
 
+class ProcessingFrame(Frame):
+    def __init__(self, screen):
+        super().__init__(screen,
+                        int(screen.height),
+                        int(screen.width),
+                        on_load=self._reload_list,
+                        hover_focus=True,
+                        can_scroll=False,
+                        title="PyPadberg")
+
+        layout_discr = Layout([1, 10, 1])
+        self.add_layout(layout_discr)
+        layout_discr.add_widget(Label("\nProcessing ...", height=3, align="^"), 1)
+
+        layout_div_1 = Layout([100])
+        self.add_layout(layout_div_1)
+        layout_div_1.add_widget(Divider())
+        # Create the form for displaying the list of contacts.
+        self._list_view = ListBox(
+            Widget.FILL_FRAME,
+            PADBERG.get_summary(),
+            name="processing-log",
+            add_scroll_bar=True,
+        )
+        layout = Layout([1, 15, 1], fill_frame=True)
+        self.add_layout(layout)
+        layout.add_widget(self._list_view, 1)
+
+        layout2 = Layout([1, 1, 1])
+        self.add_layout(layout2)
+        layout2.add_widget(Button("Continue", self._continue), 1)
+
+        self.fix()
+        # self._on_pick()
+
+    def _reload_list(self, new_value=None):
+        self._list_view.options = PADBERG.get_summary()
+        self._list_view.value = new_value
+
+    def _continue(self):
+        NextScene()
+
+
 class Interface:
 
     def __init__(self):
         pass
-    
-    def _designation(self, screen, scene):
+
+    def _seq(self, screen, scene):
         scenes = []
-        effects = [
+        scroll_effect = [
             Print(screen,
-                  ColourImageFile(screen, "ibm1620.jpg", screen.height,
-                                  uni=screen.unicode_aware),
-                  screen.height,
+                  ColourImageFile(screen, "ibm1620.jpg", screen.height, uni=screen.unicode_aware),
+                  y=screen.height,
+                  speed=1,
+                  stop_frame=(26 + screen.height)*2),
+            Scroll(screen, 3),
+        ]
+        static_image = [
+            Print(screen,
+                  ColourImageFile(screen, "ibm1620.jpg", screen.height, uni=screen.unicode_aware),
+                  y=0,
                   speed=1,
                   stop_frame=(21 + screen.height)*2),
-            Scroll(screen, 3)
         ]
-        scenes.append(Scene(effects))
-        scenes.append(Scene([TextFormFrame(screen)], -1))
+        # scenes.append(Scene(scroll_effects, name="intro"))
+        scenes.append(Scene(static_image, name="intro2"))
+        scenes.append(Scene([TextFormFrame(screen)], -1, name="main"))
+        scenes.append(Scene([ProcessingFrame(screen)], -1, name="display_processing"))
         screen.play(scenes, stop_on_resize=True, start_scene=scene)
 
     def run(self):
         last_scene = None
         while True:
             try:
-                Screen.wrapper(self._designation, catch_interrupt=False, arguments=[last_scene])
+                Screen.wrapper(self._seq, catch_interrupt=False, arguments=[last_scene])
                 sys.exit(0)
             except ResizeScreenError as e:
                 last_scene = e.scene

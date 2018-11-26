@@ -1,46 +1,59 @@
-from mido import Message, MidiFile, MidiTrack
 from audiolazy import lazy_midi
-from rhythm import rhythm_gen
 from math import floor
+from mido import Message, MidiFile, MidiTrack
+from rhythm import rhythm_gen
+from string import ascii_lowercase
 
 PITCHES_CENTER = 22
 PITCHES_OUTER = 22
 
 LETTER_FREQS = {
-    'A':440,
-    'B':458.3333,
-    'C':476.6666,
-    'D':495,
-    'E':513.3333,
-    'F':531.6666,
-    'G':550,
-    'H':568.3333,
-    'I':586.6666,
-    'J':605,
-    'K':623.3333,
-    'L':641.6666,
-    'M':660,
-    'N':678.3333,
-    'O':696.6666,
-    'P':715,
-    'Q':733.3333,
-    'R':751.6666,
-    'S':770,
-    'T':788.3333,
-    'U':806.6666,
-    'V':825,
-    'W':825,
-    'X':843.3333,
-    'Z':861.6666
+    'a': 440,
+    'b': 458.3333,
+    'c': 476.6666,
+    'd': 495,
+    'e': 513.3333,
+    'f': 531.6666,
+    'g': 550,
+    'h': 568.3333,
+    'i': 586.6666,
+    'j': 605,
+    'k': 623.3333,
+    'l': 641.6666,
+    'm': 660,
+    'n': 678.3333,
+    'o': 696.6666,
+    'p': 715,
+    'q': 733.3333,
+    'r': 751.6666,
+    's': 770,
+    't': 788.3333,
+    'u': 806.6666,
+    'v': 825,
+    'w': 825,
+    'x': 843.3333,
+    'y': 586.6666,
+    'z': 861.6666
 }
 
 
 class Padberg:
 
     def __init__(self):
-        self.mid = None
+        self._mid = None
+        self._log = []
+
+    def _print(self, text):
+        self._log.append(text)
+
+    def _sanitize_text(self, text):
+        return "".join([c for c in text.lower() if c in ascii_lowercase or c == ' '])
 
     def process_text(self, text):
+        self._print("::INFO:: Received Text - %s" % text)
+        text = self._sanitize_text(text)
+        self._print("::INFO:: Sanitized Text - %s" % text)
+
         words = text.split(' ')
 
         letters = []
@@ -49,7 +62,7 @@ class Padberg:
         for word in words:
             for letter in word:
                 letters.append(letter)
-                l_freqs.append(LETTER_FREQS[letter.upper()])
+                l_freqs.append(LETTER_FREQS[letter])
 
         vowels = 0
         consonants = 0
@@ -68,21 +81,28 @@ class Padberg:
 
         rhythm_intervals = rhythm_gen(lcm_values)
 
-        self.mid = MidiFile()
+        self._mid = MidiFile()
         track = MidiTrack()
-        self.mid.tracks.append(track)
+        self._mid.tracks.append(track)
 
         track.append(Message('program_change', program=12, time=0))
 
         for i in range(len(letters)):
             j = i % len(rhythm_intervals)
-            print(letters[i], l_freqs[i], rhythm_intervals[j])
+            self._print("::INFO:: Processing - letter: {}, freq: {}, rhythm_interval: {}".format(letters[i], l_freqs[i], rhythm_intervals[j]))
             track.append(Message('note_on', note=floor(lazy_midi.freq2midi(l_freqs[i])), velocity=80, time=25))
             track.append(Message('note_on', note=floor(lazy_midi.freq2midi(l_freqs[i])), velocity=0, time=rhythm_intervals[j]))
 
-        def save(self):
-            self.mid.save(text+'.mid')
+    def get_summary(self):
+        indices = [str(i) for i in range(len(self._log))]
+        return list(zip(self._log, indices))
 
-        def play(self):
-            if self.mid:
-                self.mid.play()
+    def save(self, title=None):
+        if title:
+            self._mid.save(title + '.mid')
+        else:
+            self._mid.save('output.mid')
+
+    def play(self):
+        if self._mid:
+            self._mid.play()

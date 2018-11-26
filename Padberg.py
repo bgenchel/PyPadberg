@@ -58,11 +58,19 @@ class Padberg:
 
         letters = []
         l_freqs = []
+        y_used = 0
 
         for word in words:
             for letter in word:
                 letters.append(letter)
-                l_freqs.append(LETTER_FREQS[letter])
+                if letter == 'y':
+                    if y_used == 0:
+                        l_freqs.append(LETTER_FREQS['i'])
+                        y_used = 1
+                    else:
+                        l_freqs.append(LETTER_FREQS['z'])
+                else:
+                    l_freqs.append(LETTER_FREQS[letter.lower()])
 
         vowels = 0
         consonants = 0

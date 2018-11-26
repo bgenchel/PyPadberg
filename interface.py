@@ -13,7 +13,7 @@ LABEL_DISCR = ["\nThis is a python implementation of Harriet Padberg's 1963 Thes
                "\n\"Computer Composed Canon and Free Fugue\".\n",
                "Enter a body of text below, and the program will convert it into serialist garbage."]
 
-PADBERG= Padberg()
+PADBERG = Padberg()
 
 class TextFormFrame(Frame):
     def __init__(self, screen):
@@ -131,22 +131,26 @@ class Interface:
 
     def _seq(self, screen, scene):
         scenes = []
-        scroll_effect = [
-            Print(screen,
-                  ColourImageFile(screen, "ibm1620.jpg", screen.height, uni=screen.unicode_aware),
-                  y=screen.height,
-                  speed=1,
-                  stop_frame=(26 + screen.height)*2),
-            Scroll(screen, 3),
-        ]
+        banner_pos = (screen.width - 100) // 2 + 1
         static_image = [
             Print(screen,
                   ColourImageFile(screen, "ibm1620.jpg", screen.height, uni=screen.unicode_aware),
                   y=0,
                   speed=1,
                   stop_frame=(21 + screen.height)*2),
+            Print(screen,
+                  FigletText("PyPadberg", "banner"),
+                  screen.height - 8, x=banner_pos,
+                  colour=Screen.COLOUR_BLACK,
+                  bg=Screen.COLOUR_BLACK,
+                  speed=1),
+            Print(screen,
+                  FigletText("PyPadberg", "banner"),
+                  screen.height - 9, x=(banner_pos + 1),
+                  colour=Screen.COLOUR_WHITE,
+                  bg=Screen.COLOUR_WHITE,
+                  speed=1),
         ]
-        # scenes.append(Scene(scroll_effects, name="intro"))
         scenes.append(Scene(static_image, name="intro2"))
         scenes.append(Scene([TextFormFrame(screen)], -1, name="main"))
         scenes.append(Scene([ProcessingFrame(screen)], -1, name="display_processing"))

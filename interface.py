@@ -5,6 +5,7 @@ from asciimatics.scene import Scene
 from asciimatics.screen import Screen
 from asciimatics.exceptions import ResizeScreenError, NextScene, StopApplication, \
     InvalidFields
+import os.path as op
 import sys
 
 from padberg import Padberg
@@ -134,7 +135,7 @@ class Interface:
         banner_pos = (screen.width - 100) // 2 + 1
         static_image = [
             Print(screen,
-                  ColourImageFile(screen, "ibm1620.jpg", screen.height, uni=screen.unicode_aware),
+                  ColourImageFile(screen, op.join(op.dirname(__file__), "ibm1620.jpg"), screen.height, uni=screen.unicode_aware),
                   y=0,
                   speed=1,
                   stop_frame=(21 + screen.height)*2),

@@ -30,8 +30,16 @@ def synth(frequencies, durations, soundtype, canon):
     pygame.mixer.music.load("one.wav")
     pygame.mixer.music.play()
 
-    if canon is True:
+    if canon >= 2:
         pygame.time.Clock().tick(canonStart)
         pygame.mixer.music.play()
-    
+
+    if canon >= 3:
+        pygame.time.Clock().tick(canonStart*2)
+        pygame.mixer.music.play()
+
+    if canon >= 4:
+        pygame.time.Clock().tick(canonStart*3)
+        pygame.mixer.music.play()
+
     pygame.event.wait()

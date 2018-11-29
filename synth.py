@@ -1,7 +1,11 @@
 import librosa as lb
 import numpy as np
-import pygame as pygame
+import pygame
+from pydub import AudioSegment
+from pydub.playback import play
+
 pygame.init()
+pygame.mixer.init()
 
 one, sr = lb.load('audio/1.wav') ## loads audio file
 two, sr = lb.load('audio/2.wav') ## loads audio file
@@ -32,19 +36,21 @@ def synth(frequencies, durations, soundtype, canon):
         new_phrase = np.append(new_phrase, new_sample_shift)
 
     lb.output.write_wav('temp.wav', new_phrase, sr, norm=False) #
+    # sound = AudioSegment.from_file("temp.wav", format="wav")
+    # play(sound)
     pygame.mixer.music.load("temp.wav")
-    pygame.mixer.music.play()
+    pygame.mixer.music.play(0)
 
     if canon >= 2:
         pygame.time.Clock().tick(canonStart)
-        pygame.mixer.music.play()
+        pygame.mixer.music.play(0)
 
     if canon >= 3:
         pygame.time.Clock().tick(canonStart*2)
-        pygame.mixer.music.play()
+        pygame.mixer.music.play(0)
 
     if canon >= 4:
         pygame.time.Clock().tick(canonStart*3)
-        pygame.mixer.music.play()
+        pygame.mixer.music.play(0)
 
     pygame.event.wait()

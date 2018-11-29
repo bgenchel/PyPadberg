@@ -1,4 +1,4 @@
-from asciimatics.widgets import Frame, TextBox, Layout, Label, Divider, Widget, Button, PopUpDialog, ListBox, \
+from asciimatics.widgets import Frame, Text, TextBox, Layout, Label, Divider, Widget, Button, PopUpDialog, ListBox, \
     RadioButtons
 from asciimatics.effects import Print, Scroll, Julia
 from asciimatics.renderers import ColourImageFile, FigletText, ImageFile
@@ -189,13 +189,13 @@ class FinalFrame(Frame):
     def _save(self):
         self.pud = PopUpDialog(self._screen, "Save Your Creation (MIDI)", ["Save", "Cancel"], on_close=self._saveit)
         layout = Layout([1, 18, 1])
-        pud.add_layout(layout)
+        self.pud.add_layout(layout)
         layout.add_widget(Text(label="Filename (no ext):", name="fname", on_change=self._on_change))
         self._scene.add_effect(self.pud)
         PADBERG.save()
 
 
-    def _savit(self):
+    def _saveit(self):
         if self.pud.data["fname"][0]:
             PADBERG.save(title=self.pud.data["fname"][0])
         else:

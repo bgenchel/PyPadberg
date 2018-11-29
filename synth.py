@@ -50,9 +50,6 @@ def synth(frequencies, durations, soundtype, canon):
     for i in range(canon):
         mixer.Channel(i).play(sounds[i][1])
 
-    while mixer.Channel(canon-1).get_busy():
-        time.Clock().tick(10)
-
     # clean up the temp files
     for fname, _ in sounds:
         os.remove(fname)

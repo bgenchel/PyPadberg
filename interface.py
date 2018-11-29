@@ -51,8 +51,7 @@ class TextFormFrame(Frame):
         self.fix()
 
     def _on_change(self):
-        self.save()
-        # changed = False
+        self.save() # changed = False
         # for key, value in self.data.items():
         #     if key not in form_data or form_data[key] != value:
         #         changed = True
@@ -130,7 +129,8 @@ class ProcessingFrame(Frame):
 # number of voices
 # play button
 form_data = {'sound_choice': "one",
-             'num_voices': 1}
+             'num_voices': 1,
+             'fname': 'output'}
 
 class FinalFrame(Frame):
     def __init__(self, screen):
@@ -142,7 +142,7 @@ class FinalFrame(Frame):
                         title="PyPadberg")
         layout_discr = Layout([1, 10, 1])
         self.add_layout(layout_discr)
-        layout_discr.add_widget(Label("Whatchawannado. YOU MUST DECIDE NOW. THE CLOCK IS TICKING", height=3, align="^"), 1)
+        layout_discr.add_widget(Label("\nWhatchawannado. YOU MUST DECIDE NOW. THE CLOCK IS TICKING", height=3, align="^"), 1)
 
         layout_div_1 = Layout([100])
         self.add_layout(layout_div_1)
@@ -150,32 +150,48 @@ class FinalFrame(Frame):
 
         layout = Layout([1, 18, 1])
         self.add_layout(layout)
-        layout.add_widget(RadioButtons([("one", "one"),
-                                        ("two", "two"),
-                                        ("three", "three")],
+        layout.add_widget(RadioButtons([("one", "one"), ("two", "two"), ("three", "three")],
                                        label="Choose a Sound:",
                                        name="sound_choice",
                                        on_change=self._on_change), 1)
 
-        layout.add_widget(RadioButtons([("1", 1), ("2", 2), ("3", 3), ("4", 4)],
+        layout_spacer = Layout([1, 18, 1])
+        self.add_layout(layout_spacer)
+        layout_spacer.add_widget(Label(" "*100, height=2, align="^"), 1)
+
+        layout2 = Layout([1, 18, 1])
+        self.add_layout(layout2)
+        layout2.add_widget(RadioButtons([("1", 1), ("2", 2), ("3", 3), ("4", 4)],
                                        label="How Many Voices?:",
                                        name="num_voices",
                                        on_change=self._on_change), 1)
+
+        layout_spacer2 = Layout([1, 18, 1])
+        self.add_layout(layout_spacer2)
+        layout_spacer2.add_widget(Label(" "*100, height=2, align="^"), 1)
+
+        layout_label = Layout([1, 10, 1])
+        self.add_layout(layout_label)
+        layout_spacer2.add_widget(Label("You may optionally enter a name to save your file under in the box below.", 
+                                  height=3, align="^"), 1)
+
+        layout3 = Layout([1, 18, 1], fill_frame=True)
+        self.add_layout(layout3)
+        layout3.add_widget(Text(label="Filename: ", name="fname", on_change=self._on_change), 1)
 
         layout_div_2 = Layout([100])
         self.add_layout(layout_div_2)
         layout_div_2.add_widget(Divider())
 
-        layout_buttons = Layout([1, 1, 1, 1])
+        layout_buttons = Layout([1, 3, 3, 1])
         self.add_layout(layout_buttons)
-        layout_buttons.add_widget(Button("Play", self._play), 0)
-        layout_buttons.add_widget(Button("Save", self._save), 1)
-        layout_buttons.add_widget(Button("Make Another", self._make_another), 2)
-        layout_buttons.add_widget(Button("Quit", self._quit), 3)
-        # layout2.add_widget(Button("Submit", self._submit), 1)
-        # self._reset_button = Button("Reset", self._reset)
-        # layout2.add_widget(self._reset_button, 0)
-        self.save()
+        layout_buttons.add_widget(Button("Play", self._play), 1)
+        layout_buttons.add_widget(Button("Save", self._save), 2)
+
+        layout_buttons2 = Layout([1, 3, 3, 1])
+        self.add_layout(layout_buttons2)
+        layout_buttons2.add_widget(Button("Make Another", self._make_another), 1)
+        layout_buttons2.add_widget(Button("Quit", self._quit), 2)
         self.fix()
 
     def _on_change(self):
@@ -185,18 +201,15 @@ class FinalFrame(Frame):
         PADBERG.play(self.data["sound_choice"], self.data["num_voices"])
 
     def _save(self):
-        self.pud = PopUpDialog(self._screen, "Save Your Creation (MIDI)", ["Save", "Cancel"], on_close=self._saveit)
-        layout = Layout([1, 18, 1])
-        self.pud.add_layout(layout)
-        layout.add_widget(Text(label="Filename (no ext):", name="fname", on_change=self._on_change))
-        self._scene.add_effect(self.pud)
-        PADBERG.save()
+        self._scene.add_effect(
+            PopUpDialog(self._screen,
+                        "Save Phrase as MIDI?",
+                        ["Yes", "No"],
+                        on_close=self._saveit))
 
-    def _saveit(self):
-        if self.pud.data["fname"][0]:
-            PADBERG.save(title=self.pud.data["fname"][0])
-        else:
-            PADBERG.save()
+    def _saveit(self, selected):
+        if selected == 0:
+            PADBERG.save(title=self.data["fname"][0])
 
     def _make_another(self):
         raise NextScene("text_entry")
@@ -222,27 +235,27 @@ class Interface:
 
     def _seq(self, screen, scene):
         scenes = []
-        # banner_pos = (screen.width - 100) // 2 + 20
-        # static_image = [
-        #     Print(screen,
-        #           ColourImageFile(screen, "ibm1620.jpg", screen.height, uni=screen.unicode_aware),
-        #           y=0,
-        #           speed=1,
-        #           stop_frame=(21 + screen.height)*2),
-        #     Print(screen,
-        #           FigletText("PyPadberg", "banner"),
-        #           screen.height - 8, x=banner_pos,
-        #           colour=Screen.COLOUR_BLACK,
-        #           bg=Screen.COLOUR_BLACK,
-        #           speed=1),
-        #     Print(screen,
-        #           FigletText("PyPadberg", "banner"),
-        #           screen.height - 9, x=(banner_pos + 1),
-        #           colour=Screen.COLOUR_WHITE,
-        #           bg=Screen.COLOUR_WHITE,
-        #           speed=1),
-        # ]
-        # scenes.append(Scene(static_image, name="intro2"))
+        banner_pos = (screen.width - 100) // 2 + 20
+        static_image = [
+            Print(screen,
+                  ColourImageFile(screen, "ibm1620.jpg", screen.height, uni=screen.unicode_aware),
+                  y=0,
+                  speed=1,
+                  stop_frame=(21 + screen.height)*2),
+            Print(screen,
+                  FigletText("PyPadberg", "banner"),
+                  screen.height - 8, x=banner_pos,
+                  colour=Screen.COLOUR_BLACK,
+                  bg=Screen.COLOUR_BLACK,
+                  speed=1),
+            Print(screen,
+                  FigletText("PyPadberg", "banner"),
+                  screen.height - 9, x=(banner_pos + 1),
+                  colour=Screen.COLOUR_WHITE,
+                  bg=Screen.COLOUR_WHITE,
+                  speed=1),
+        ]
+        scenes.append(Scene(static_image, name="intro2"))
         scenes.append(Scene([TextFormFrame(screen)], -1, name="text_entry"))
         scenes.append(Scene([ProcessingFrame(screen)], -1, name="display_processing"))
         final_frame = [Julia(screen), FinalFrame(screen)]

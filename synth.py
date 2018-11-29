@@ -1,12 +1,9 @@
 import librosa as lb
 import numpy as np
-import subprocess
+import os
+from pygame import *
 import pygame
-from pydub import AudioSegment
-from pydub.playback import play
-
-pygame.init()
-pygame.mixer.init()
+import soundfile
 
 one, sr = lb.load('audio/1.wav') ## loads audio file
 two, sr = lb.load('audio/2.wav') ## loads audio file
@@ -18,42 +15,44 @@ soundtypes =  {
     "three": three
 }
 
-#Frequencies in HZ, durations in ms, soundtype is one,two,three
 def synth(frequencies, durations, soundtype, canon):
+    pygame.init()
+    #brew install sdl sdl_image sdl_mixer sdl_ttf portmidi
+    mixer.pre_init(44100, 16, 2, 4096)
+    mixer.init()
 
     pitches = lb.core.hz_to_midi(frequencies) % 60
 
-    durationMod = [x % 8 for x in durations]
+    durationMod = [(x % 32)/8 + 1 for x in durations]
 
     canonStart = sum(durationMod[0:2])
 
-    new_sample = soundtypes[soundtype]
-    new_phrase = []
-    new_sample_shift = []
+    sample = soundtypes[soundtype]
+    phrase = np.empty((0))
 
     for p, l in zip(pitches, durationMod):
-        new_sample_shift = lb.effects.pitch_shift(new_sample, sr, n_steps=p)
-        new_sample_shift = lb.effects.time_stretch(new_sample_shift, l)
-        new_phrase = np.append(new_phrase, new_sample_shift)
+        sample_shift = lb.effects.pitch_shift(sample, sr, n_steps=p)
+        sample_shift = lb.effects.time_stretch(sample_shift, l)
+        phrase = np.append(phrase, sample_shift)
 
-    lb.output.write_wav('temp.wav', new_phrase, sr, norm=False) #
-    subprocess.call(['play', 'temp.wav'], stdout=open("output.txt"))
-    # subprocess.Popen(['play', 'temp.wav']) 
-    # sound = AudioSegment.from_file("temp.wav", format="wav")
-    # play(sound)
-    # pygame.mixer.music.load("temp.wav")
-    # pygame.mixer.music.play(0)
+    phrases = [phrase]    
+    for i in range(1, 4):
+        phrases.append(np.insert(phrase, 0, np.zeros(int(canonStart * 11025.0 * i))))
 
-    if canon >= 2:
-        pygame.time.Clock().tick(canonStart)
-        pygame.mixer.music.play(0)
+    sounds = []
+    for i, phrase in enumerate(phrases):
+        # lb.output.write_wav('temp%i.wav' % (i + 1), phrase.astype(np.float16), sr, norm=False) 
+        fname = 'temp_%i.wav' % (i + 1)
+        soundfile.write(fname, phrase, sr, subtype="PCM_16")
+        sounds.append((fname, mixer.Sound(fname)))
 
-    if canon >= 3:
-        pygame.time.Clock().tick(canonStart*2)
-        pygame.mixer.music.play(0)
+    mixer.set_num_channels(canon)
+    for i in range(canon):
+        mixer.Channel(i).play(sounds[i][1])
 
-    if canon >= 4:
-        pygame.time.Clock().tick(canonStart*3)
-        pygame.mixer.music.play(0)
+    while mixer.Channel(canon-1).get_busy():
+        time.Clock().tick(10)
 
-    pygame.event.wait()
+    # clean up the temp files
+    for fname, _ in sounds:
+        os.remove(fname)

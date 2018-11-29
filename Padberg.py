@@ -86,7 +86,6 @@ class Padberg:
             characters += 1
 
         lcm_values = [vowels, consonants, characters, PITCHES_CENTER, PITCHES_OUTER]
-
         rhythm_intervals = rhythm_gen(lcm_values)
 
         self._mid = MidiFile()
@@ -94,12 +93,16 @@ class Padberg:
         self._mid.tracks.append(track)
 
         track.append(Message('program_change', program=12, time=0))
-
+        durations = []
         for i in range(len(letters)):
             j = i % len(rhythm_intervals)
+            durations.append(rhythm_intervals[j])
             self._print("::INFO:: Processing - letter: {}, freq: {}, rhythm_interval: {}".format(letters[i], l_freqs[i], rhythm_intervals[j]))
             track.append(Message('note_on', note=floor(lazy_midi.freq2midi(l_freqs[i])), velocity=80, time=25))
             track.append(Message('note_on', note=floor(lazy_midi.freq2midi(l_freqs[i])), velocity=0, time=rhythm_intervals[j]))
+
+        self.freqs = l_freqs
+        self.durs = durations
 
     def get_summary(self):
         indices = [str(i) for i in range(len(self._log))]

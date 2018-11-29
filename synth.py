@@ -35,13 +35,13 @@ def synth(frequencies, durations, soundtype, canon):
         sample_shift = lb.effects.time_stretch(sample_shift, l)
         phrase = np.append(phrase, sample_shift)
 
-    phrases = [phrase]    
+    phrases = [phrase]
     for i in range(1, 4):
         phrases.append(np.insert(phrase, 0, np.zeros(int(canonStart * 11025.0 * i))))
 
     sounds = []
     for i, phrase in enumerate(phrases):
-        # lb.output.write_wav('temp%i.wav' % (i + 1), phrase.astype(np.float16), sr, norm=False) 
+        # lb.output.write_wav('temp%i.wav' % (i + 1), phrase.astype(np.float16), sr, norm=False)
         fname = 'temp_%i.wav' % (i + 1)
         soundfile.write(fname, phrase, sr, subtype="PCM_16")
         sounds.append((fname, mixer.Sound(fname)))

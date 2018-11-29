@@ -49,10 +49,14 @@ class Padberg:
     def _print(self, text):
         self._log.append(text)
 
+    def _reset_log(self):
+        self._log = []
+
     def _sanitize_text(self, text):
         return "".join([c for c in text.lower() if c in ascii_lowercase or c == ' '])
 
     def process_text(self, text):
+        self._reset_log()
         self._print("::INFO:: Received Text - %s" % text)
         text = self._sanitize_text(text)
         self._print("::INFO:: Sanitized Text - %s" % text)

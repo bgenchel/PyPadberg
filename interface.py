@@ -12,7 +12,7 @@ from padberg import Padberg
 
 LABEL_DISCR = ["\nThis is a python implementation of Harriet Padberg's 1963 Thesis,",
                "\n\"Computer Composed Canon and Free Fugue\".\n",
-               "Enter a body of text below, and the program will convert it into serialist garbage."]
+               "Enter a body of text below, and the program will convert it into the perfect piece of music."]
 
 PADBERG = Padberg()
 
@@ -139,10 +139,11 @@ class FinalFrame(Frame):
                         int(screen.width * 2 // 3),
                         data=form_data,
                         has_shadow=True,
-                        title="PyPadberg")
+                       title="PyPadberg")
         layout_discr = Layout([1, 10, 1])
         self.add_layout(layout_discr)
-        layout_discr.add_widget(Label("\nWhatchawannado. YOU MUST DECIDE NOW. THE CLOCK IS TICKING", height=3, align="^"), 1)
+        layout_discr.add_widget(Label("\nSelect instrument and number of voices for you piece below.\
+", height=3, align="^"), 1)
 
         layout_div_1 = Layout([100])
         self.add_layout(layout_div_1)

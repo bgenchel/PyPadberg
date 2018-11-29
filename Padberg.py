@@ -3,6 +3,7 @@ from math import floor
 from mido import Message, MidiFile, MidiTrack
 from rhythm import rhythm_gen
 from string import ascii_lowercase
+from synth import synth
 
 PITCHES_CENTER = 22
 PITCHES_OUTER = 22
@@ -41,6 +42,8 @@ class Padberg:
 
     def __init__(self):
         self._mid = None
+        self._freqs = None
+        self._durs = None
         self._log = []
 
     def _print(self, text):
@@ -101,8 +104,8 @@ class Padberg:
             track.append(Message('note_on', note=floor(lazy_midi.freq2midi(l_freqs[i])), velocity=80, time=25))
             track.append(Message('note_on', note=floor(lazy_midi.freq2midi(l_freqs[i])), velocity=0, time=rhythm_intervals[j]))
 
-        self.freqs = l_freqs
-        self.durs = durations
+        self._freqs = l_freqs
+        self._durs = durations
 
     def get_summary(self):
         indices = [str(i) for i in range(len(self._log))]
@@ -114,6 +117,5 @@ class Padberg:
         else:
             self._mid.save('output.mid')
 
-    def play(self):
-        if self._mid:
-            self._mid.play()
+    def play(self, sound=1, num_voices=1):
+        synth(self._freqs, self._durs, sound, num_voices)

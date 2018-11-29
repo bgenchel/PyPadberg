@@ -1,6 +1,6 @@
 from asciimatics.widgets import Frame, TextBox, Layout, Label, Divider, Widget, Button, PopUpDialog, ListBox, \
     RadioButtons
-from asciimatics.effects import Print, Scroll
+from asciimatics.effects import Print, Scroll, Julia
 from asciimatics.renderers import ColourImageFile, FigletText, ImageFile
 from asciimatics.scene import Scene
 from asciimatics.screen import Screen
@@ -61,7 +61,7 @@ class TextFormFrame(Frame):
 
     def _reset(self):
         self.reset()
-        raise NextScene()
+        raise NextScene("text_entry")
 
     def _submit(self):
         self.save(validate=True)
@@ -74,107 +74,6 @@ class TextFormFrame(Frame):
                         "Are you sure?",
                         ["Yes", "No"],
                         on_close=self._quit_on_yes))
-
-    @staticmethod
-    def _quit_on_yes(selected):
-        # Yes is the first button
-        if selected == 0:
-            raise StopApplication("User requested exit")
-
-
-class FinalFrame(Frame):
-    def __init__(self, screen):
-        super(DemoFrame, self).__init__(screen,
-                                        int(screen.height * 2 // 3),
-                                        int(screen.width * 2 // 3),
-                                        data=form_data,
-                                        has_shadow=True,
-                                        name="My Form")
-        layout = Layout([1, 18, 1])
-        self.add_layout(layout)
-        self._reset_button = Button("Reset", self._reset)
-        layout.add_widget(TextBox(5,
-                            label="My First Box:",
-                            name="TA",
-                            on_change=self._on_change), 1)
-        layout.add_widget(
-            Text(label="Alpha:",
-                 name="TB",
-                 on_change=self._on_change,
-                 validator="^[a-zA-Z]*$"), 1)
-        layout.add_widget(
-            Text(label="Number:",
-                 name="TC",
-                 on_change=self._on_change,
-                 validator="^[0-9]*$"), 1)
-        layout.add_widget(
-            Text(label="Email:",
-                 name="TD",
-                 on_change=self._on_change,
-                 validator=self._check_email), 1)
-        layout.add_widget(Divider(height=2), 1)
-        layout.add_widget(Label("Group 2:"), 1)
-        layout.add_widget(RadioButtons([("Option 1", 1),
-                                        ("Option 2", 2),
-                                        ("Option 3", 3)],
-                                       label="A Longer Selection:",
-                                       name="Things",
-                                       on_change=self._on_change), 1)
-        layout.add_widget(CheckBox("Field 1",
-                                   label="A very silly long name for fields:",
-                                   name="CA",
-                                   on_change=self._on_change), 1)
-        layout.add_widget(
-            CheckBox("Field 2", name="CB", on_change=self._on_change), 1)
-        layout.add_widget(
-            CheckBox("Field 3", name="CC", on_change=self._on_change), 1)
-        layout.add_widget(Divider(height=3), 1)
-        layout2 = Layout([1, 1, 1])
-        self.add_layout(layout2)
-        layout2.add_widget(self._reset_button, 0)
-        layout2.add_widget(Button("View Data", self._view), 1)
-        layout2.add_widget(Button("Quit", self._quit), 2)
-        self.fix()
-
-    def _on_change(self):
-        changed = False
-        self.save()
-        for key, value in self.data.items():
-            if key not in form_data or form_data[key] != value:
-                changed = True
-                break
-        self._reset_button.disabled = not changed
-
-    def _reset(self):
-        self.reset()
-        raise NextScene()
-
-    def _view(self):
-        # Build result of this form and display it.
-        try:
-            self.save(validate=True)
-            message = "Values entered are:\n\n"
-            for key, value in self.data.items():
-                message += "- {}: {}\n".format(key, value)
-        except InvalidFields as exc:
-            message = "The following fields are invalid:\n\n"
-            for field in exc.fields:
-                message += "- {}\n".format(field)
-        self._scene.add_effect(
-            PopUpDialog(self._screen, message, ["OK"]))
-
-    def _quit(self):
-        self._scene.add_effect(
-            PopUpDialog(self._screen,
-                        "Are you sure?",
-                        ["Yes", "No"],
-                        on_close=self._quit_on_yes))
-
-    @staticmethod
-    def _check_email(value):
-        m = re.match(r"^[a-zA-Z0-9_\-.]+@[a-zA-Z0-9_\-.]+\.[a-zA-Z0-9_\-.]+$",
-                     value)
-        return len(value) == 0 or m is not None
 
     @staticmethod
     def _quit_on_yes(selected):
@@ -223,22 +122,24 @@ class ProcessingFrame(Frame):
         self._list_view.value = new_value
 
     def _continue(self):
-        NextScene()
+        raise NextScene()
 
 
 # a button what sound to use
 # save midi
 # number of voices
 # play button
+form_data = {'sound_choice': "one",
+             'num_voices': 1}
 
 class FinalFrame(Frame):
     def __init__(self, screen):
         super().__init__(screen,
-                         int(screen.height),
-                         int(screen.width),
-                         data=form_data,
-                         has_shadow=True,
-                         name="PyPadberg")
+                        int(screen.height * 2 // 3),
+                        int(screen.width * 2 // 3),
+                        data=form_data,
+                        has_shadow=True,
+                        title="PyPadberg")
         layout_discr = Layout([1, 10, 1])
         self.add_layout(layout_discr)
         layout_discr.add_widget(Label("Whatchawannado. YOU MUST DECIDE NOW. THE CLOCK IS TICKING", height=3, align="^"), 1)
@@ -249,9 +150,9 @@ class FinalFrame(Frame):
 
         layout = Layout([1, 18, 1])
         self.add_layout(layout)
-        layout.add_widget(RadioButtons([("1", 1),
-                                        ("2", 2),
-                                        ("3", 3)],
+        layout.add_widget(RadioButtons([("one", "one"),
+                                        ("two", "two"),
+                                        ("three", "three")],
                                        label="Choose a Sound:",
                                        name="sound_choice",
                                        on_change=self._on_change), 1)
@@ -267,84 +168,41 @@ class FinalFrame(Frame):
 
         layout_buttons = Layout([1, 1, 1, 1])
         self.add_layout(layout_buttons)
-        layout2.add_widget(Button("Play", self._play), 0)
-        layout2.add_widget(Button("Save", self._save), 1)
-        layout2.add_widget(Button("Make Another", self._make_another), 2)
-        layout2.add_widget(Button("Quit", self._quit), 3)
+        layout_buttons.add_widget(Button("Play", self._play), 0)
+        layout_buttons.add_widget(Button("Save", self._save), 1)
+        layout_buttons.add_widget(Button("Make Another", self._make_another), 2)
+        layout_buttons.add_widget(Button("Quit", self._quit), 3)
         # layout2.add_widget(Button("Submit", self._submit), 1)
         # self._reset_button = Button("Reset", self._reset)
         # layout2.add_widget(self._reset_button, 0)
-
-        layout.add_widget(Label("Group 1:"), 1)
-        layout.add_widget(TextBox(5,
-                                  label="My First Box:",
-                                  name="TA",
-                                  on_change=self._on_change), 1)
-        layout.add_widget(
-            Text(label="Alpha:",
-                 name="TB",
-                 on_change=self._on_change,
-                 validator="^[a-zA-Z]*$"), 1)
-        layout.add_widget(
-            Text(label="Number:",
-                 name="TC",
-                 on_change=self._on_change,
-                 validator="^[0-9]*$"), 1)
-        layout.add_widget(
-            Text(label="Email:",
-                 name="TD",
-                 on_change=self._on_change,
-                 validator=self._check_email), 1)
-        layout.add_widget(Divider(height=2), 1)
-        layout.add_widget(Label("Group 2:"), 1)
-        layout.add_widget(RadioButtons([("Option 1", 1),
-                                        ("Option 2", 2),
-                                        ("Option 3", 3)],
-                                       label="A Longer Selection:",
-                                       name="Things",
-                                       on_change=self._on_change), 1)
-        layout.add_widget(CheckBox("Field 1",
-                                   label="A very silly long name for fields:",
-                                   name="CA",
-                                   on_change=self._on_change), 1)
-        layout.add_widget(
-            CheckBox("Field 2", name="CB", on_change=self._on_change), 1)
-        layout.add_widget(
-            CheckBox("Field 3", name="CC", on_change=self._on_change), 1)
-        layout.add_widget(Divider(height=3), 1)
-        layout2 = Layout([1, 1, 1])
-        self.add_layout(layout2)
-        layout2.add_widget(self._reset_button, 0)
-        layout2.add_widget(Button("View Data", self._view), 1)
-        layout2.add_widget(Button("Quit", self._quit), 2)
+        self.save()
         self.fix()
 
     def _on_change(self):
-        changed = False
         self.save()
-        for key, value in self.data.items():
-            if key not in form_data or form_data[key] != value:
-                changed = True
-                break
-        self._reset_button.disabled = not changed
 
-    def _reset(self):
-        self.reset()
-        raise NextScene()
+    def _play(self):
+        import pdb
+        pdb.set_trace()
+        PADBERG.play(self.data["sound_choice"], self.data["num_voices"])
 
-    def _view(self):
-        # Build result of this form and display it.
-        try:
-            self.save(validate=True)
-            message = "Values entered are:\n\n"
-            for key, value in self.data.items():
-                message += "- {}: {}\n".format(key, value)
-        except InvalidFields as exc:
-            message = "The following fields are invalid:\n\n"
-            for field in exc.fields:
-                message += "- {}\n".format(field)
-        self._scene.add_effect(
-            PopUpDialog(self._screen, message, ["OK"]))
+    def _save(self):
+        self.pud = PopUpDialog(self._screen, "Save Your Creation (MIDI)", ["Save", "Cancel"], on_close=self._saveit)
+        layout = Layout([1, 18, 1])
+        pud.add_layout(layout)
+        layout.add_widget(Text(label="Filename (no ext):", name="fname", on_change=self._on_change))
+        self._scene.add_effect(self.pud)
+        PADBERG.save()
+
+
+    def _savit(self):
+        if self.pud.data["fname"][0]:
+            PADBERG.save(title=self.pud.data["fname"][0])
+        else:
+            PADBERG.save()
+
+    def _make_another(self):
+        raise NextScene("text_entry")
 
     def _quit(self):
         self._scene.add_effect(
@@ -352,12 +210,6 @@ class FinalFrame(Frame):
                         "Are you sure?",
                         ["Yes", "No"],
                         on_close=self._quit_on_yes))
-
-    @staticmethod
-    def _check_email(value):
-        m = re.match(r"^[a-zA-Z0-9_\-.]+@[a-zA-Z0-9_\-.]+\.[a-zA-Z0-9_\-.]+$",
-                     value)
-        return len(value) == 0 or m is not None
 
     @staticmethod
     def _quit_on_yes(selected):
@@ -372,29 +224,31 @@ class Interface:
 
     def _seq(self, screen, scene):
         scenes = []
-        banner_pos = (screen.width - 100) // 2 + 1
-        static_image = [
-            Print(screen,
-                  ColourImageFile(screen, "ibm1620.jpg", screen.height, uni=screen.unicode_aware),
-                  y=0,
-                  speed=1,
-                  stop_frame=(21 + screen.height)*2),
-            Print(screen,
-                  FigletText("PyPadberg", "banner"),
-                  screen.height - 8, x=banner_pos,
-                  colour=Screen.COLOUR_BLACK,
-                  bg=Screen.COLOUR_BLACK,
-                  speed=1),
-            Print(screen,
-                  FigletText("PyPadberg", "banner"),
-                  screen.height - 9, x=(banner_pos + 1),
-                  colour=Screen.COLOUR_WHITE,
-                  bg=Screen.COLOUR_WHITE,
-                  speed=1),
-        ]
-        scenes.append(Scene(static_image, name="intro2"))
-        scenes.append(Scene([TextFormFrame(screen)], -1, name="main"))
+        # banner_pos = (screen.width - 100) // 2 + 20
+        # static_image = [
+        #     Print(screen,
+        #           ColourImageFile(screen, "ibm1620.jpg", screen.height, uni=screen.unicode_aware),
+        #           y=0,
+        #           speed=1,
+        #           stop_frame=(21 + screen.height)*2),
+        #     Print(screen,
+        #           FigletText("PyPadberg", "banner"),
+        #           screen.height - 8, x=banner_pos,
+        #           colour=Screen.COLOUR_BLACK,
+        #           bg=Screen.COLOUR_BLACK,
+        #           speed=1),
+        #     Print(screen,
+        #           FigletText("PyPadberg", "banner"),
+        #           screen.height - 9, x=(banner_pos + 1),
+        #           colour=Screen.COLOUR_WHITE,
+        #           bg=Screen.COLOUR_WHITE,
+        #           speed=1),
+        # ]
+        # scenes.append(Scene(static_image, name="intro2"))
+        scenes.append(Scene([TextFormFrame(screen)], -1, name="text_entry"))
         scenes.append(Scene([ProcessingFrame(screen)], -1, name="display_processing"))
+        final_frame = [Julia(screen), FinalFrame(screen)]
+        scenes.append(Scene(final_frame, -1, name="end_menu"))
         screen.play(scenes, stop_on_resize=True, start_scene=scene)
 
     def run(self):

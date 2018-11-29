@@ -7,7 +7,7 @@ Run `python main.py` to start the program.
 * `main.py` creates an interface instance and runs it.
 * `interface.py` defines the interface, which contains an instance of the Padberg object, defined in `padberg.py`
 * The interface allows the user to input text and passes it to the Padberg object, which processes it according to our implementation of Padberg's original algorithm.
-* The algorithm defines the pitch contour of the resulting cannon by mapping letters to a microtonal scale (defined in `padberg.py`), and defines the rhythm using the relatively prime factors of the least common multiple of 5 numbers:
+* The algorithm defines the pitch contour of the resulting cannon by mapping letters to a microtonal scale (defined in `padberg.py`), and defines the rhythm (`rhythm.py`) using the relatively prime factors of the least common multiple of 5 numbers:
   * the number of vowels
   * the number of consonants
   * the total length of the text

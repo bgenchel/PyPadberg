@@ -7,6 +7,11 @@ one, sr = lb.load('audio/1.wav') ## loads audio file
 two, sr = lb.load('audio/2.wav') ## loads audio file
 three, sr = lb.load('audio/3.wav') ## loads audio file
 
+soundtypes =  {
+    "one": one,
+    "two": two,
+    "three": three
+}
 
 #Frequencies in HZ, durations in ms, soundtype is one,two,three
 def synth(frequencies, durations, soundtype, canon):
@@ -17,7 +22,7 @@ def synth(frequencies, durations, soundtype, canon):
 
     canonStart = sum(durationMod[0:2])
 
-    new_sample = soundtype
+    new_sample = soundtypes[soundtype]
     new_phrase = []
     new_sample_shift = []
 
@@ -26,8 +31,8 @@ def synth(frequencies, durations, soundtype, canon):
         new_sample_shift = lb.effects.time_stretch(new_sample_shift, l)
         new_phrase = np.append(new_phrase, new_sample_shift)
 
-    lb.output.write_wav('one.wav', new_phrase, sr, norm=False) #
-    pygame.mixer.music.load("one.wav")
+    lb.output.write_wav('temp.wav', new_phrase, sr, norm=False) #
+    pygame.mixer.music.load("temp.wav")
     pygame.mixer.music.play()
 
     if canon >= 2:

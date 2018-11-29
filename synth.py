@@ -15,6 +15,8 @@ soundtypes =  {
     "three": three
 }
 
+intervals = [0.0, -8.0, -12.0, -20.0]
+
 def synth(frequencies, durations, soundtype, canon):
     pygame.init()
     #brew install sdl sdl_image sdl_mixer sdl_ttf portmidi
@@ -28,22 +30,23 @@ def synth(frequencies, durations, soundtype, canon):
     canonStart = sum(durationMod[0:2])
 
     sample = soundtypes[soundtype]
-    phrase = np.empty((0))
+    phrase = [np.empty((0)), np.empty((0)), np.empty((0)), np.empty((0))]
 
-    for p, l in zip(pitches, durationMod):
-        sample_shift = lb.effects.pitch_shift(sample, sr, n_steps=p)
-        sample_shift = lb.effects.time_stretch(sample_shift, l)
-        phrase = np.append(phrase, sample_shift)
+    for i in range(0, 4):
+        for p, l in zip(pitches, durationMod):
+            sample_shift = lb.effects.pitch_shift(sample, sr, n_steps=p+intervals[i])
+            sample_shift = lb.effects.time_stretch(sample_shift, l)
+            phrase[i] = np.append(phrase[i], sample_shift)
 
-    phrases = [phrase]
     for i in range(1, 4):
-        phrases.append(np.insert(phrase, 0, np.zeros(int(canonStart * 11025.0 * i))))
+        phrase[i] = np.insert(phrase[i], 0, np.zeros(int(canonStart * 11025.0 * i)))
+
 
     sounds = []
-    for i, phrase in enumerate(phrases):
+    for i in range(0,4):
         # lb.output.write_wav('temp%i.wav' % (i + 1), phrase.astype(np.float16), sr, norm=False)
         fname = 'temp_%i.wav' % (i + 1)
-        soundfile.write(fname, phrase, sr, subtype="PCM_16")
+        soundfile.write(fname, phrase[i], sr, subtype="PCM_16")
         sounds.append((fname, mixer.Sound(fname)))
 
     mixer.set_num_channels(canon)

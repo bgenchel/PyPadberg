@@ -182,8 +182,6 @@ class FinalFrame(Frame):
         self.save()
 
     def _play(self):
-        import pdb
-        pdb.set_trace()
         PADBERG.play(self.data["sound_choice"], self.data["num_voices"])
 
     def _save(self):
@@ -193,7 +191,6 @@ class FinalFrame(Frame):
         layout.add_widget(Text(label="Filename (no ext):", name="fname", on_change=self._on_change))
         self._scene.add_effect(self.pud)
         PADBERG.save()
-
 
     def _saveit(self):
         if self.pud.data["fname"][0]:
@@ -216,6 +213,7 @@ class FinalFrame(Frame):
         # Yes is the first button
         if selected == 0:
             raise StopApplication("User requested exit")
+
 
 class Interface:
 

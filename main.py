@@ -1,5 +1,4 @@
-from interface import Interface
-from padberg import Padberg
+from src.interface import Interface
 
 if __name__ == '__main__':
     program = Interface()

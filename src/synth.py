@@ -1,13 +1,15 @@
 import librosa as lb
 import numpy as np
 import os
+import os.path as op
 from pygame import *
 import pygame
 import soundfile
 
-one, sr = lb.load('audio/1.wav') ## loads audio file
-two, sr = lb.load('audio/2.wav') ## loads audio file
-three, sr = lb.load('audio/3.wav') ## loads audio file
+this_dir = op.dirname(op.abspath(__file__))
+one, sr = lb.load(op.join(this_dir, 'assets', 'audio', '1.wav')) ## loads audio file
+two, sr = lb.load(op.join(this_dir, 'assets', 'audio', '2.wav')) ## loads audio file
+three, sr = lb.load(op.join(this_dir, 'assets', 'audio', '3.wav')) ## loads audio file
 
 soundtypes =  {
     "one": one,

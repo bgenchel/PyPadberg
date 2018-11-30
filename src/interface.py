@@ -1,20 +1,21 @@
-from asciimatics.widgets import Frame, Text, TextBox, Layout, Label, Divider, Widget, Button, PopUpDialog, ListBox, \
-    RadioButtons
 from asciimatics.effects import Print, Scroll, Julia
 from asciimatics.renderers import ColourImageFile, FigletText, ImageFile
 from asciimatics.scene import Scene
 from asciimatics.screen import Screen
-from asciimatics.exceptions import ResizeScreenError, NextScene, StopApplication, \
-    InvalidFields
+from asciimatics.exceptions import ResizeScreenError, NextScene, StopApplication, InvalidFields
+from asciimatics.widgets import Frame, Text, TextBox, Layout, Label, Divider, Widget, Button, PopUpDialog, ListBox, \
+    RadioButtons
+import os.path as op
 import sys
 
-from padberg import Padberg
+from .padberg import Padberg
 
 LABEL_DISCR = ["\nThis is a python implementation of Harriet Padberg's 1963 Thesis,",
                "\n\"Computer Composed Canon and Free Fugue\".\n",
                "Enter a body of text below, and the program will convert it into the perfect piece of music."]
-
 PADBERG = Padberg()
+DIRNAME = op.dirname(op.abspath(__file__))
+
 
 class TextFormFrame(Frame):
     def __init__(self, screen):
@@ -239,7 +240,7 @@ class Interface:
         banner_pos = (screen.width - 100) // 2 + 20
         static_image = [
             Print(screen,
-                  ColourImageFile(screen, "ibm1620.jpg", screen.height, uni=screen.unicode_aware),
+                  ColourImageFile(screen, op.join(DIRNAME, "assets", "images", "ibm1620.jpg"), screen.height, uni=screen.unicode_aware),
                   y=0,
                   speed=1,
                   stop_frame=(21 + screen.height)*2),

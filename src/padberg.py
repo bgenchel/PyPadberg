@@ -1,9 +1,9 @@
 from audiolazy import lazy_midi
 from math import floor
 from mido import Message, MidiFile, MidiTrack
-from rhythm import rhythm_gen
 from string import ascii_lowercase
-from synth import synth
+from .rhythm import rhythm_gen
+from .synth import synth
 
 PITCHES_CENTER = 22
 PITCHES_OUTER = 22

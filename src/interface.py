@@ -174,7 +174,7 @@ class FinalFrame(Frame):
 
         layout_label = Layout([1, 10, 1])
         self.add_layout(layout_label)
-        layout_spacer2.add_widget(Label("You may optionally enter a name to save your file under in the box below.", 
+        layout_spacer2.add_widget(Label("You may optionally enter a name to save your melody under in the box below.", 
                                   height=3, align="^"), 1)
 
         layout3 = Layout([1, 18, 1], fill_frame=True)
@@ -185,10 +185,11 @@ class FinalFrame(Frame):
         self.add_layout(layout_div_2)
         layout_div_2.add_widget(Divider())
 
-        layout_buttons = Layout([1, 3, 3, 1])
+        layout_buttons = Layout([1, 6, 6, 6, 1])
         self.add_layout(layout_buttons)
         layout_buttons.add_widget(Button("Play", self._play), 1)
-        layout_buttons.add_widget(Button("Save", self._save), 2)
+        layout_buttons.add_widget(Button("Save Audio", self._save_audio), 2)
+        layout_buttons.add_widget(Button("Save CSV", self._save_csv), 3)
 
         layout_buttons2 = Layout([1, 3, 3, 1])
         self.add_layout(layout_buttons2)
@@ -202,16 +203,27 @@ class FinalFrame(Frame):
     def _play(self):
         PADBERG.play(self.data["sound_choice"], self.data["num_voices"])
 
-    def _save(self):
+    def _save_audio(self):
         self._scene.add_effect(
             PopUpDialog(self._screen,
-                        "Save Phrase as MIDI?",
+                        "Save audio as .wav file?",
                         ["Yes", "No"],
-                        on_close=self._saveit))
+                        on_close=self._saveit_audio))
 
-    def _saveit(self, selected):
+    def _save_csv(self):
+        self._scene.add_effect(
+            PopUpDialog(self._screen,
+                        "Save melody as .csv file?",
+                        ["Yes", "No"],
+                        on_close=self._saveit_csv))
+
+    def _saveit_audio(self, selected):
         if selected == 0:
-            PADBERG.save(title=self.data["fname"][0])
+            PADBERG.save_audio(self.data["sound_choice"], title=self.data["fname"])
+
+    def _saveit_csv(self, selected):
+        if selected == 0:
+            PADBERG.save_csv(title=self.data["fname"])
 
     def _make_another(self):
         raise NextScene("text_entry")

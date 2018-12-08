@@ -3,7 +3,7 @@ from math import floor
 from mido import Message, MidiFile, MidiTrack
 from string import ascii_lowercase
 from .rhythm import rhythm_gen
-from .synth import synth
+from .synth import Synth
 
 PITCHES_CENTER = 22
 PITCHES_OUTER = 22
@@ -45,6 +45,7 @@ class Padberg:
         self._freqs = None
         self._durs = None
         self._log = []
+        self._synth = Synth()
 
     def _print(self, text):
         self._log.append(text)
@@ -110,16 +111,22 @@ class Padberg:
 
         self._freqs = l_freqs
         self._durs = durations
+        self._synth.initialize(l_freqs, durations)
 
     def get_summary(self):
         indices = [str(i) for i in range(len(self._log))]
         return list(zip(self._log, indices))
 
-    def save(self, title=None):
-        if title:
-            self._mid.save(title + '.mid')
-        else:
-            self._mid.save('output.mid')
-
     def play(self, sound=1, num_voices=1):
-        synth(self._freqs, self._durs, sound, num_voices)
+        self._synth.play(sound, num_voices)
+
+    def save_csv(self, title=None):
+        if not title:
+            title = "output"
+
+        with open(title + '.csv', 'w') as csvfile:
+            for tup in zip(self._freqs, self._durs):
+                csvfile.write("%f,%f\n" % (tup[0], tup[1]))
+
+    def save_audio(self, sound=1, title=None):
+        self._synth.save(sound, title=title)

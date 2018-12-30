@@ -21,8 +21,8 @@ INTERVALS = [0.0, -8.0, -12.0, -20.0]
 
 class Synth:
     def __init__(self):
-        # for saving if desired 
-        self.voices = None 
+        # for saving if desired
+        self.voices = None
         self.pitches = None
         self.dursMod = None
         self.sample_rate = None
@@ -72,6 +72,12 @@ class Synth:
     def save(self, soundtype, title=None):
         voices, sample_rate = self._make_voices(soundtype)
         if title:
-            soundfile.write(title + ".wav", voices[0], sample_rate, subtype="PCM_16")
+            soundfile.write(title + "1.wav", voices[0], sample_rate, subtype="PCM_16")
+            soundfile.write(title + "2.wav", voices[1], sample_rate, subtype="PCM_16")
+            soundfile.write(title + "3.wav", voices[2], sample_rate, subtype="PCM_16")
+            soundfile.write(title + "4.wav", voices[3], sample_rate, subtype="PCM_16")
         else:
             soundfile.write("output.wav", voices[0], sample_rate, subtype="PCM_16")
+            soundfile.write("output.wav", voices[1], sample_rate, subtype="PCM_16")
+            soundfile.write("output.wav", voices[2], sample_rate, subtype="PCM_16")
+            soundfile.write("output.wav", voices[3], sample_rate, subtype="PCM_16")

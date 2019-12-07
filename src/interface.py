@@ -10,7 +10,7 @@ import sys
 
 from .padberg import Padberg
 
-LABEL_DISCR = ["\nThis is a python implementation of Harriet Padberg's 1963 Thesis,",
+LABEL_DISCR = ["\nThis is a python implementation of Harriet Padberg's 1964 Thesis,",
                "\n\"Computer Composed Canon and Free Fugue\".\n",
                "Enter a body of text below, and the program will convert it into the perfect piece of music."]
 PADBERG = Padberg()
@@ -35,7 +35,7 @@ class TextFormFrame(Frame):
 
         layout_textbox = Layout([1, 18, 1], fill_frame=True)
         self.add_layout(layout_textbox)
-        layout_textbox.add_widget(TextBox(Widget.FILL_FRAME, name="IT", label="Write Something!", 
+        layout_textbox.add_widget(TextBox(Widget.FILL_FRAME, name="IT", label="Write Something!",
             on_change=self._on_change), 1)
 
         layout_div_2 = Layout([100])
@@ -174,7 +174,7 @@ class FinalFrame(Frame):
 
         layout_label = Layout([1, 10, 1])
         self.add_layout(layout_label)
-        layout_spacer2.add_widget(Label("You may optionally enter a name to save your melody under in the box below.", 
+        layout_spacer2.add_widget(Label("You may optionally enter a name to save your melody under in the box below.",
                                   height=3, align="^"), 1)
 
         layout3 = Layout([1, 18, 1], fill_frame=True)

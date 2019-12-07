@@ -1,5 +1,5 @@
 # PyPadberg
-A Python recreation of Harriet Padberg's 1965 Thesis, "Computer Composed Canon and Free Fugue," one of the first instances of algorithmic music created using a computer.
+A Python recreation of Harriet Padberg's 1964 Thesis, "Computer Composed Canon and Free Fugue," one of the first instances of algorithmic music created using a computer.
 
 Run `python main.py` to start the program.
 

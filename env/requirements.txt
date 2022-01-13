@@ -13,7 +13,7 @@ mido==1.2.9
 numba==0.41.0
 numpy==1.15.4
 pefile==2018.8.8
-pillow==5.3.0
+pillow==9.0.0
 pycparser==2.19
 pyfiglet==0.7.6
 pygame==1.9.4

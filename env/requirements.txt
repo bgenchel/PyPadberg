@@ -11,7 +11,7 @@ llvmlite==0.26.0
 macholib==1.11
 mido==1.2.9
 numba==0.41.0
-numpy==1.15.4
+numpy==1.22.0
 pefile==2018.8.8
 pillow==5.3.0
 pycparser==2.19

@@ -5,7 +5,7 @@ audioread==2.1.6
 cffi==1.11.5
 decorator==4.3.0
 future==0.17.1
-joblib==0.13.0
+joblib==1.2.0
 librosa==0.6.2
 llvmlite==0.26.0
 macholib==1.11

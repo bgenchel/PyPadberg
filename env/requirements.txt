@@ -20,7 +20,7 @@ pygame==1.9.4
 pyinstaller==3.4
 resampy==0.2.1
 scikit-learn==0.20.1
-scipy==1.1.0
+scipy==1.10.0
 six==1.11.0
 soundfile==0.10.2
 wcwidth==0.1.7
